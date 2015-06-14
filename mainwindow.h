@@ -5,6 +5,7 @@
  *
  *
  * */
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -29,8 +30,6 @@ public slots:
     //reads pending datagram sent by another Program at
     // a particular port
     void readPendingDatagrams();
-
-
 
 private slots:
     void on_startLaserButton_clicked();
