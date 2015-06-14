@@ -1,3 +1,10 @@
+/*
+ * This class is a UDP sender which sends
+ * packets containing control instructions for
+ * RE05 laser sensor.
+ *
+ */
+
 #ifndef UDPHOST_H
 #define UDPHOST_H
 
@@ -8,45 +15,24 @@ class UdpHost : public QObject
     public:
         UdpHost();
 
-        void sendData();
-
-
-        //RECQRE - do it later
-
-        //RESIPC 10Char Serial[] IP-4
-
-        //REHOME - do it later
-
-        //RESTOP
-
-        //RESEAC    Accelaration - 4
-
-        //REGEAA
-
-        //RESEAA    Az-2 Elev-2 Spd-2
-
-        //RETRAA
-
-
-        //RESFFS
+        //Sends datagram for Full Field Scan mode
         bool setFullFieldScan(int Azimuthal_value, int Scanline_value);
 
-        //RESBES
+        //Sends datagram for Bounded Elevation Scan mode
         bool setBoundedElevationScan(float upper_bound, float lower_bound);
 
-        //RESRES
+        //Sends datagram for Region Scan mode
         bool setRegionScan(float upper_bound, float lower_bound, float lAngular, float rAngular);
 
-        //RERNLS
+        //Sends datagram for starting the laser sensor simulator
         bool runLaserSensor(int Azimuthal_value, int Scanline_value);
 
-        //RESTLS
+        //Sends datagram for stopping the sensor
         bool stopLaserSensor();
 
-
-
-
     private:
+
+        //Socket for sending data
         QUdpSocket *socket;
 };
 

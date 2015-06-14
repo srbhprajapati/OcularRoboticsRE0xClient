@@ -1,3 +1,12 @@
+/*
+ * This thread contains the openGL Context for
+ * rendering of sensed point cloud onto the UI
+ * screen. CPU time saving OpenGL rendering thread.
+ * This thread only renders when its corresponding
+ * QGLWidget subclass render() method is called
+ * (might be called from a different thread).
+ */
+
 #ifndef CLIENTGLTHREAD_H
 #define CLIENTGLTHREAD_H
 
@@ -7,90 +16,77 @@
 #include "udphost.h"
 
 #include <QtNetwork/QUdpSocket>
+
+//forward declaration of ClientGLWidget
 class ClientGLWidget;
 
-/** CPU time saving OpenGL rendering thread.
- * This thread only renders when its corresponding QGLWidget subclass
- * render() method is called (might be called from a different thread).
- */
 class ClientGLThread : public QThread
 {
 public:
 
-    /** Init an OpenGl render thread for the _glwidget QGL */
+    //Init an OpenGl render thread for the _glwidget QGL
     ClientGLThread(ClientGLWidget& _glw);
 
-    /** main() function of the thread. */
+    // main() function of the thread.
     void run();
 
-    /** Signal the thread to exit the next time it is woken up. */
+    // Signal the thread to exit the next time it is woken up.
     void stop();
 
-    /** Request a resize of the GL viewport.
-     * This is usually called from the QGLWidgets resizeEvent() method.
-     */
+    // Request a resize of the GL viewport.
+    // This is usually called from the QGLWidgets resizeEvent() method.
     void resizeViewport(const QSize& _size);
 
-    /** Change settings for rendering. */
+    // Change settings for rendering.
     void setRotation( GLfloat _x, GLfloat _y, GLfloat _z);
 
-    /** Returns the color of a cube face.
-     * This function can be called from different threads!
-     */
-    int faceAtPosition(const QPoint &pos);
-
-    /** The six face colors of the cube
-     * This should not be public!
-     */
-    QColor faceColors[6];
-
-
-    /// \brief  Sends the Data through UDP Socket
-    void sendData();
-
-
-
-
-
-    //RESFFS
+    //Asks the udphost to send datagram for Full Field Scan Mode
     bool setFullFieldScan(int Azimuthal_value, int Scanline_value);
 
-    //RESBES
+    //Asks the udphost to send datagram for Bounded Elevation Scan Mode
     bool setBoundedElevationScan(float upper_bound, float lower_bound);
 
-    //RESRES
+    //Asks the udphost to send datagram for Region Scan Mode
     bool setRegionScan(float upper_bound, float lower_bound, float lAngular, float rAngular);
 
-    //RERNLS
+    //Asks the udphost to send datagram for starting the laser sensor
     bool start_laser(int Azimuthal_value, int Scanline_value);
 
-    //RESTLS
+    //Asks the udphost to send datagram for stopping the laser sensor
     bool stopLaserSensor();
 
-
+    //Updates the array containing all the points. It replaces the existing
+    //points with newly acquired ones once the whole array is filled up.
     void updateScene(QByteArray pointData);
 
 
 protected:
-    /** Init the GL environment. */
+
+    // Init the GL environment.
     void initializeGL();
-    /** Handles resizes of the GL viewport. */
+
+    // Handles resizes of the GL viewport.
     void resizeGL(int width, int height);
-    /** Does all the painting. */
+
+    // Does all the painting.
     void paintGL();
 
 private:
-    /** Actually draws the example scene (cube). */
+
+    // Actually draws the Scene
     void draw();
-    /** The QGLWidget of the render thread.
-     * This widget provides the GL rendering context.
-     */
+
+    // The QGLWidget of the render thread.
+    // This widget provides the GL rendering context.
     ClientGLWidget& glw;
-    /** Keep the thread running as long this flag is true. */
+
+    // Keep the thread running as long this flag is true.
     volatile bool render_flag;
-    /** Perform a resize when this flag is true. */
+
+    // Perform a resize when this flag is true.
     volatile bool resize_flag;
-    /** Current size of the viewport. */
+
+    // Current size of the viewport.
     QSize viewport_size;
 
     // example implmentation members
@@ -98,8 +94,10 @@ private:
     GLfloat rotationY;
     GLfloat rotationZ;
 
+    //UdpHost Object for sending UDP packets to Server
     UdpHost *_udp;
 
+    //Array consisting of all the sensed points
     float *points;
     bool doRendering;
     int pointCounter;

@@ -32,15 +32,19 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_startLaserButton_clicked()
 {
+    //Read Azimuthal and Elevation Value
     int Azimuthal_value = ui->AzimuthalspinBox->value();
     int Scanline_value = ui->scanLineSpinBox->value();
 
+    //Set Azimuthal and Elevation Value to display tag
     ui->AzimuthalFullScanLabel->setText(QString::number(Azimuthal_value));
     ui->ScanLineFullScanLabel->setText(QString::number(Scanline_value));
 
+    //For starting the rendering in ClientGLWidget
     ui->widget->start_laser(Azimuthal_value, Scanline_value);
 
-    //Set Value to Text Labels
+
+    //Set Value to Other Text Labels
     ui->AzimuthalFullScanLabel->setText(QString::number(Azimuthal_value));
     ui->AzimuthalFreqLabel->setText(QString::number(Azimuthal_value));
 
@@ -62,22 +66,28 @@ void MainWindow::on_startLaserButton_clicked()
 
 void MainWindow::on_stopLaserButton_clicked()
 {
+    //For stopping the rendering in ClientGLWidget
     ui->widget->stopLaserSensor();
+
+    //Set Value to Other Text Labels
     ui->LaserStatusLabel->setText(QString("OFF"));
 }
 
 
 void MainWindow::on_fullScanModeButton_clicked()
 {
+    //Read Azimuthal and Elevation Value
     int Azimuthal_value = ui->AzimuthalspinBox->value();
     int Scanline_value = ui->scanLineSpinBox->value();
 
+    //Set Azimuthal and Elevation Value to display tag
     ui->AzimuthalFullScanLabel->setText(QString::number(Azimuthal_value));
     ui->ScanLineFullScanLabel->setText(QString::number(Scanline_value));
 
+    //call Full Field Scan method in ClientGLWidget
     ui->widget->setFullFieldScan(Azimuthal_value, Scanline_value);
 
-    //Set Value to Text Labels
+    //Set Value to Other Text Labels
     ui->scanModeValueLabel->setText(QString("FS"));
 
     ui->AzimuthalFullScanLabel->setText(QString::number(Azimuthal_value));
@@ -90,35 +100,45 @@ void MainWindow::on_fullScanModeButton_clicked()
 
 void MainWindow::on_boundedElevationModeButton_clicked()
 {
+    //Read Upper and Lower Bound Values
     float upper_bound = ui->UpperBoundSpinBox->value();
     float lower_bound = ui->LowerBoundSpinBox->value();
 
+    //call Bounded Elevation Scan method in ClientGLWidget
     ui->widget->setBoundedElevationScan(upper_bound, lower_bound);
+
+    //Set Value to Other Text Labels
     ui->scanModeValueLabel->setText(QString("BES"));
 }
 
 void MainWindow::on_regionScanModeButton_clicked()
 {
+    //Read Upper Bound, LowerBound, Left Bound, and Right Bound from the UI
     float upper_bound = ui->UpperBoundRegionSpinBox->value();
     float lower_bound = ui->LowerBoundRegionSpinBox->value();
     float lAngular = ui->AngularLeftSpinBox->value();
     float rAngular = ui->AngularRightSpinBox->value();
 
+    //call Bounded Elevation Scan method in ClientGLWidget
     ui->widget->setRegionScan(upper_bound, lower_bound, lAngular, rAngular);
+
+    //Set Value to Other Text Labels
     ui->scanModeValueLabel->setText(QString("RS"));
 }
 
 
-
+//Funtion not used currently
+//Reason : this function is intentionally no working because it makes
+//          more sense to change the model from server only.
 void MainWindow::on_openAction_clicked()
 {
-    qDebug()<<"Open Action button Clicked";
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "C:/", tr("Data Files(*.obj, *.ply)"));
 }
 
 
 void MainWindow::readPendingDatagrams()
 {
+    //while data is available
     while (socket->hasPendingDatagrams()) {
         QByteArray datagram;
         datagram.resize(socket->pendingDatagramSize());
@@ -129,22 +149,8 @@ void MainWindow::readPendingDatagrams()
                                 &sender, &senderPort);
 
 
+        //render the data
         ui->widget->updateScene(datagram);
-/*
-        QDataStream dStream(&datagram, QIODevice::ReadOnly);
-        float x=0, y=0, z=0;
-            float x1=0, y1=0, z1=0;
-
-        dStream>>x;
-        dStream>>y;
-        dStream>>z;
-
-        dStream>>x1;
-        dStream>>y1;
-        dStream>>z1;
-
-        qDebug()<<"Datagram : "<<x<<" "<<y<<" "<<z<<" "<<x1<<" "<<y1<<" "<<z1;*/
-        //i++;
     }
 
 }

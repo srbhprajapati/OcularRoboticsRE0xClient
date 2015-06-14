@@ -12,10 +12,6 @@ ClientGLWidget::ClientGLWidget(QWidget *parent)
     // Buffer swap is handled in the rendering thread
     setAutoBufferSwap(false);
 
-
-
-
-
     // start the rendering thread
     initRendering();
 }
@@ -47,17 +43,7 @@ void ClientGLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void ClientGLWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    // get the name of the clicked surface
-    int face = glt.faceAtPosition(event->pos());
-    if (face != -1)
-    {
-        QColor color = QColorDialog::getColor(glt.faceColors[face],
-                                              this);
-        if (color.isValid())
-        {
-            glt.faceColors[face] = color;
-        }
-    }
+    // implement Mouse Double Click Event here
 }
 
 void ClientGLWidget::initRendering( )

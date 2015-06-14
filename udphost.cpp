@@ -9,30 +9,6 @@ UdpHost::UdpHost()
     //socket->bind(QHostAddress::Any, 1234);
 }
 
-void UdpHost::sendData()
-{
-    QByteArray Data;
-    QDataStream dStream(&Data, QIODevice::WriteOnly);
-
-    for(int i=0; i<200; i++)
-    {
-        for(int j=0; j<100; j++)
-        {
-            qint16 x = (qrand()%(36000)) + 0.12341234;
-            qint16 y = (qrand()%(36000))+ 0.12341234;
-            qint16 z = (qrand()%(36000))+ 0.12341234;
-            dStream<<x;
-            dStream<<y;
-            dStream<<z;
-
-            //Data.append("This is Test.");
-        }
-        int size = Data.size();
-        Data.clear();
-    }
-
-
-}
 
 bool UdpHost::setFullFieldScan(int Azimuthal_value, int Scanline_value)
 {
