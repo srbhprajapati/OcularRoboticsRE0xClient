@@ -64,6 +64,8 @@ private slots:
     void on_openAction_clicked();
 
 
+    void on_actionSave_triggered();
+
 private:
 
     //Pointer to the designer form

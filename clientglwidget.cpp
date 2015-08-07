@@ -137,18 +137,29 @@ bool ClientGLWidget::setFullFieldScan(int Azimuthal_value, int Scanline_value)
     return glt.setFullFieldScan(Azimuthal_value, Scanline_value);
 }
 
-bool ClientGLWidget::setBoundedElevationScan(float upper_bound, float lower_bound)
+bool ClientGLWidget::setBoundedElevationScan(int Azimuthal_value, int Scanline_value, float upper_bound, float lower_bound)
 {
-    return glt.setBoundedElevationScan(upper_bound, lower_bound);
+    return glt.setBoundedElevationScan(Azimuthal_value, Scanline_value, upper_bound, lower_bound);
 }
 
-bool ClientGLWidget::setRegionScan(float upper_bound, float lower_bound, float lAngular, float rAngular)
+bool ClientGLWidget::setRegionScan(int Azimuthal_value, int Scanline_value, float upper_bound, float lower_bound, float lAngular, float rAngular)
 {
-    return glt.setRegionScan(upper_bound, lower_bound, lAngular, rAngular);
+    return glt.setRegionScan(Azimuthal_value, Scanline_value, upper_bound, lower_bound, lAngular, rAngular);
 }
 
 
 void ClientGLWidget::updateScene(QByteArray pointData)
 {
     glt.updateScene(pointData);
+}
+
+
+void ClientGLWidget::openModel(QString filename)
+{
+    glt.openModel(filename);
+}
+
+void ClientGLWidget::saveModel(QString filename)
+{
+    glt.saveModel(filename);
 }

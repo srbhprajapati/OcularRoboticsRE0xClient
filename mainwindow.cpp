@@ -100,12 +100,17 @@ void MainWindow::on_fullScanModeButton_clicked()
 
 void MainWindow::on_boundedElevationModeButton_clicked()
 {
+
+    //Read Azimuthal and Elevation Value
+    int Azimuthal_value = ui->AzimuthalspinBox->value();
+    int Scanline_value = ui->scanLineSpinBox->value();
+
     //Read Upper and Lower Bound Values
     float upper_bound = ui->UpperBoundSpinBox->value();
     float lower_bound = ui->LowerBoundSpinBox->value();
 
     //call Bounded Elevation Scan method in ClientGLWidget
-    ui->widget->setBoundedElevationScan(upper_bound, lower_bound);
+    ui->widget->setBoundedElevationScan(Azimuthal_value, Scanline_value, upper_bound, lower_bound);
 
     //Set Value to Other Text Labels
     ui->scanModeValueLabel->setText(QString("BES"));
@@ -113,6 +118,10 @@ void MainWindow::on_boundedElevationModeButton_clicked()
 
 void MainWindow::on_regionScanModeButton_clicked()
 {
+    //Read Azimuthal and Elevation Value
+    int Azimuthal_value = ui->AzimuthalspinBox->value();
+    int Scanline_value = ui->scanLineSpinBox->value();
+
     //Read Upper Bound, LowerBound, Left Bound, and Right Bound from the UI
     float upper_bound = ui->UpperBoundRegionSpinBox->value();
     float lower_bound = ui->LowerBoundRegionSpinBox->value();
@@ -120,7 +129,7 @@ void MainWindow::on_regionScanModeButton_clicked()
     float rAngular = ui->AngularRightSpinBox->value();
 
     //call Bounded Elevation Scan method in ClientGLWidget
-    ui->widget->setRegionScan(upper_bound, lower_bound, lAngular, rAngular);
+    ui->widget->setRegionScan(Azimuthal_value, Scanline_value, upper_bound, lower_bound, lAngular, rAngular);
 
     //Set Value to Other Text Labels
     ui->scanModeValueLabel->setText(QString("RS"));
@@ -132,7 +141,12 @@ void MainWindow::on_regionScanModeButton_clicked()
 //          more sense to change the model from server only.
 void MainWindow::on_openAction_clicked()
 {
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "C:/", tr("Data Files(*.obj, *.ply)"));
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "C:/", tr("Data Files( *.obj *.ply)"));
+    if(!filename.isEmpty())
+    {
+        ui->widget->openModel(filename);
+    }
+
 }
 
 
@@ -148,9 +162,21 @@ void MainWindow::readPendingDatagrams()
         socket->readDatagram(datagram.data(), datagram.size(),
                                 &sender, &senderPort);
 
-
         //render the data
         ui->widget->updateScene(datagram);
+    }
+
+}
+
+
+void MainWindow::on_actionSave_triggered()
+{
+
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save File"), "C:/", tr("Data Files(*.pcd)"));
+
+    if(!filename.isEmpty())
+    {
+        ui->widget->saveModel(filename);
     }
 
 }

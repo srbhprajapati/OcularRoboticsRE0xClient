@@ -57,10 +57,10 @@ public:
     bool setFullFieldScan(int Azimuthal_value, int Scanline_value);
 
     //Asks the udphost to send datagram for Bounded Elevation Scan
-    bool setBoundedElevationScan(float upper_bound, float lower_bound);
+    bool setBoundedElevationScan(int Azimuthal_value, int Scanline_value, float upper_bound, float lower_bound);
 
     //Asks the udphost to send datagram for Region Scan
-    bool setRegionScan(float upper_bound, float lower_bound, float lAngular, float rAngular);
+    bool setRegionScan(int Azimuthal_value, int Scanline_value, float upper_bound, float lower_bound, float lAngular, float rAngular);
 
     //Asks the udphost to send datagram for starting the laser sensor
     bool start_laser(int Azimuthal_value, int Scanline_value);
@@ -68,6 +68,11 @@ public:
     //Asks the udphost to send datagram for stopping the laser sensor
     bool stopLaserSensor();
 
+    //Opens a new Model as simulation Model
+    void openModel(QString filename);
+
+    //Saves the Point Cloud
+    void saveModel(QString filename);
 
 public slots:
 

@@ -44,10 +44,10 @@ public:
     bool setFullFieldScan(int Azimuthal_value, int Scanline_value);
 
     //Asks the udphost to send datagram for Bounded Elevation Scan Mode
-    bool setBoundedElevationScan(float upper_bound, float lower_bound);
+    bool setBoundedElevationScan(int Azimuthal_value, int Scanline_value, float upper_bound, float lower_bound);
 
     //Asks the udphost to send datagram for Region Scan Mode
-    bool setRegionScan(float upper_bound, float lower_bound, float lAngular, float rAngular);
+    bool setRegionScan(int Azimuthal_value, int Scanline_value, float upper_bound, float lower_bound, float lAngular, float rAngular);
 
     //Asks the udphost to send datagram for starting the laser sensor
     bool start_laser(int Azimuthal_value, int Scanline_value);
@@ -58,6 +58,12 @@ public:
     //Updates the array containing all the points. It replaces the existing
     //points with newly acquired ones once the whole array is filled up.
     void updateScene(QByteArray pointData);
+
+    //Saves the acquired model to the file system
+    void saveModel(QString path);
+
+    //Opens a new Model as simulation Model
+    void openModel(QString filename);
 
 
 protected:

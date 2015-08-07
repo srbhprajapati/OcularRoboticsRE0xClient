@@ -4,10 +4,12 @@
 #include <QtOpenGL/QtOpenGL>
 #include <gl/GLU.h>
 #include <QtNetwork/QUdpSocket>
+#include <cmath>
 
 #include <QtCore/QDataStream>
 #include <QtCore/QByteArray>
 
+#define PIBY2 1.57142857143
 
 ClientGLThread::ClientGLThread(ClientGLWidget & _glw )
         : QThread(),
@@ -166,14 +168,14 @@ bool ClientGLThread::setFullFieldScan(int Azimuthal_value, int Scanline_value)
     return _udp->setFullFieldScan(Azimuthal_value, Scanline_value);
 }
 
-bool ClientGLThread::setBoundedElevationScan(float upper_bound, float lower_bound)
+bool ClientGLThread::setBoundedElevationScan(int Azimuthal_value, int Scanline_value, float upper_bound, float lower_bound)
 {
-    return _udp->setBoundedElevationScan(upper_bound, lower_bound);
+    return _udp->setBoundedElevationScan(Azimuthal_value, Scanline_value, upper_bound, lower_bound);
 }
 
-bool ClientGLThread::setRegionScan(float upper_bound, float lower_bound, float lAngular, float rAngular)
+bool ClientGLThread::setRegionScan(int Azimuthal_value, int Scanline_value, float upper_bound, float lower_bound, float lAngular, float rAngular)
 {
-    return _udp->setRegionScan(upper_bound, lower_bound, lAngular, rAngular);
+    return _udp->setRegionScan(Azimuthal_value, Scanline_value, upper_bound, lower_bound, lAngular, rAngular);
 }
 
 
@@ -183,32 +185,70 @@ void ClientGLThread::updateScene(QByteArray pointData)
     doRendering = false;
 
     QDataStream dStream(&pointData, QIODevice::ReadOnly);
-    float x=0, y=0, z=0;
-    float x1=0, y1=0, z1=0;
+
+    unsigned char* dataPointer = reinterpret_cast<unsigned char*>(pointData.data());
 
     for(int i=0; i<100; i++)
     {
+        unsigned short azimuthalAngle = dataPointer[8*i + 1]<<8 |  dataPointer[8*i];
+        short elevationAngle = dataPointer[8*i + 3]<<8 |  dataPointer[8*i + 2];
+        unsigned short range = dataPointer[8*i + 5]<<8 |  dataPointer[8*i + 4];
+
+        float elevationAngleConverted = ((float)elevationAngle)/100.0;
+        float azimuthalAngleConverted = ((float)azimuthalAngle)/100.0;
+        float rangeConverted = ((float)range)/1000.0;
+
+        if(elevationAngle>3501 || elevationAngle <-3500)
+        {
+            qDebug()<<"dssafsdhl";
+        }
+
+//        float elevationAngleConverted = 0.0;
+//        float azimuthalAngleConverted = 0.0;
+//        float rangeConverted = 0.0;
+
+//        dStream>>azimuthalAngleConverted;
+//        dStream>>elevationAngleConverted;
+//        dStream>>rangeConverted;
+
+        float x = rangeConverted*sin(PIBY2 - elevationAngleConverted*0.0174532925)*cos(azimuthalAngleConverted*0.0174532925);
+        float z = - rangeConverted*sin(PIBY2 - elevationAngleConverted*0.0174532925)*sin(azimuthalAngleConverted*0.0174532925);
+        float y = rangeConverted*cos(PIBY2 - elevationAngleConverted*0.0174532925);
+
+
+
         if(pointCounter<299997)
         {
-            dStream>>points[pointCounter];
+            points[pointCounter] = x;
             pointCounter++;
-            dStream>>points[pointCounter];
+            points[pointCounter] = y;
             pointCounter++;
-            dStream>>points[pointCounter];
+            points[pointCounter] = z;
             pointCounter++;
         }
         else
         {
             pointCounter=0;
-            dStream>>points[pointCounter];
+            points[pointCounter] = x;
             pointCounter++;
-            dStream>>points[pointCounter];
+            points[pointCounter] = y;
             pointCounter++;
-            dStream>>points[pointCounter];
+            points[pointCounter] = z;
             pointCounter++;
         }
     }
     qDebug()<<"Datagram : "<<points[pointCounter-3]<<" "<<points[pointCounter-2]<<" "<<points[pointCounter-1];
 
     doRendering = true;
+}
+
+
+void ClientGLThread::saveModel(QString path)
+{
+    _udp->saveModel(path);
+}
+
+void ClientGLThread::openModel(QString filename)
+{
+    _udp->openModel(filename);
 }
